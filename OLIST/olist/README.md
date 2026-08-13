@@ -59,3 +59,26 @@ Dataset publico de e-commerce Brasileiro
 
 --------
 
+
+
+# OLIST - Machine Learning
+
+## Status do Projeto
+
+Projeto iniciado e ambiente de desenvolvimento configurado.
+
+### Ambiente
+
+- Python: 3.13
+- Gerenciamento de dependências: UV
+- Ambiente virtual: `.venv`
+- Dependências controladas por:
+  - `pyproject.toml`
+  - `uv.lock`
+
+### Inicialização do Projeto
+
+Após clonar o repositório, execute:
+
+```bash
+uv sync
