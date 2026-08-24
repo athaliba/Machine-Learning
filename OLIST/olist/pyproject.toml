@@ -21,6 +21,7 @@ dependencies = [
     "ipywidgets>=8.1.8",
     "jupyter>=1.1.1",
     "jupyterlab",
+    "lightgbm>=4.7.0",
     "loguru",
     "matplotlib",
     "mkdocs",
@@ -37,6 +38,7 @@ dependencies = [
     "setuptools<81",
     "tqdm",
     "typer",
+    "xgboost>=3.4.1",
 ]
 requires-python = ">=3.13,<3.14"
 
