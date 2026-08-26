@@ -1,6 +1,9 @@
 from pathlib import Path
 from module_olist.dataset import load_dataset, create_dataset, save_dataset
+from sklearn.model_selection import train_test_split
 from module_olist.features import create_features
+from module_olist.modeling.train import train_models
+from module_olist.modeling.evaluate import evaluate_models
 
 
 def main():
@@ -19,8 +22,20 @@ def main():
     data = create_dataset(orders,items,customers,)
     # Cria as features
     data = create_features(data)
-    # Salva o dataset final
+
+    # Salva dataset intermediário
     save_dataset(data,output_path,)
+
+    # Separação das variáveis
+    X = data.drop(columns=["is_late"])
+    y = data["is_late"]
+    # Train/Test split
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42,stratify=y,)
+
+    # Treina modelos
+    models = train_models(X_train,y_train,)
+    # Avalia modelos
+    evaluate_models(models,X_test,y_test,)
 
 if __name__ == "__main__":
     main()
