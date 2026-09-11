@@ -1,32 +1,20 @@
-import pandas as pd
-
-from module_olist.modeling.pipeline import (
-    create_gradient_boosting_pipeline,
-    create_lightgbm_pipeline,
-    create_xgboost_pipeline,
-)
+from sklearn.pipeline import Pipeline
+from loguru import logger
 
 
-def train_models(
-    X_train: pd.DataFrame,
-    y_train: pd.Series,
+def train_model(
+    model: Pipeline,
+    X_train,
+    y_train,
 ):
-    models = {
-        "Gradient Boosting": create_gradient_boosting_pipeline(),
-        "LightGBM": create_lightgbm_pipeline(),
-        "XGBoost": create_xgboost_pipeline(),
-    }
 
-    trained_models = {}
+    logger.info("Treinando modelo final...")
 
-    for name, model in models.items():
-        print(f"Training {name}...")
+    model.fit(
+        X_train,
+        y_train,
+    )
 
-        model.fit(
-            X_train,
-            y_train,
-        )
+    logger.success("Modelo treinado com sucesso.")
 
-        trained_models[name] = model
-
-    return trained_models
+    return model
