@@ -3,10 +3,6 @@ from module_olist.config import (
     MODELS_DIR,
 )
 
-from module_olist.dataset import (
-    load_data,
-)
-
 from module_olist.modeling.predict import (
     load_model,
     predict,
@@ -18,10 +14,13 @@ import pandas as pd
 
 def main():
 
-    # Carrega o dataset já preparado
-    data = pd.read_csv(INTERIM_DATA_DIR / "orders_dataset_refined.csv")
+    # Carrega o dataset preparado
+    data = pd.read_csv(
+        INTERIM_DATA_DIR / "olist_dataset.csv"
+    )
 
-    # somente as features usadas no treinamento
+
+    # Seleciona somente as features utilizadas no treinamento
     X = data[
         [
             "promised_days",
@@ -36,33 +35,43 @@ def main():
         ]
     ]
 
-    # Seleciona algumas amostras
-    X_sample = X.sample(n=5, random_state=42,)
 
-    # Carrega o modelo já treinado
-    model, model_name, threshold = (
-        load_model(
-            model_path=(
-                MODELS_DIR /
-                "best_model.joblib"
-            ),
-            metadata_path=(
-                MODELS_DIR /
-                "metadata.json"
-            ),
-        )
+    # Seleciona algumas amostras para teste de inferência
+    X_sample = X.sample(
+        n=5,
+        random_state=42,
     )
 
-    # Realiza a inferência
+
+    # Carrega modelo treinado e metadados
+    model, model_name, threshold = load_model(
+        model_path=(
+            MODELS_DIR /
+            "best_model.joblib"
+        ),
+        metadata_path=(
+            MODELS_DIR /
+            "metadata.json"
+        ),
+    )
+
+
+    # Realiza a previsão
     predictions = predict(
         model=model,
         X=X_sample,
         threshold=threshold,
     )
 
-    logger.info(f"Amostras selecionadas para inferência: {X_sample}\n")
 
-    logger.success(f"Predições realizadas:\n{predictions}")
+    logger.info(
+        f"Amostras selecionadas:\n{X_sample}"
+    )
+
+    logger.success(
+        f"Modelo utilizado: {model_name}\n"
+        f"Predições realizadas:\n{predictions}"
+    )
 
 
 if __name__ == "__main__":

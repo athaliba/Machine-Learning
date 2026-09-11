@@ -1,11 +1,17 @@
 from pathlib import Path
 
-from module_olist.dataset import load_dataset, create_dataset, save_dataset
+from module_olist.dataset import (
+    load_dataset,
+    create_dataset,
+    save_dataset,
+)
+
 from module_olist.features import create_features
 
 from module_olist.modeling.split import split_data
 from module_olist.modeling.cross_validation import cross_validate_models
 from module_olist.modeling.train import train_model
+from module_olist.modeling.save import save_model
 
 from module_olist.modeling.pipeline import (
     create_gradient_boosting_pipeline,
@@ -15,8 +21,11 @@ from module_olist.modeling.pipeline import (
 
 from module_olist.modeling.evaluate import evaluate_model
 
+from module_olist.config import MODELS_DIR
+
 
 def main():
+
     # Diretório raiz do projeto OLIST
     base_dir = Path(__file__).resolve().parent.parent
 
@@ -28,6 +37,7 @@ def main():
     # Arquivo de saída
     output_path = base_dir / "data" / "interim" / "olist_dataset.csv"
 
+
     # Carrega os dados
     orders, items, customers = load_dataset(
         orders_path,
@@ -35,15 +45,20 @@ def main():
         customers_path,
     )
 
-    # Cria o dataset
+
+    # Cria dataset
     data = create_dataset(
         orders,
         items,
         customers,
     )
 
-    # Cria as features
-    data = create_features(data)
+
+    # Cria features
+    data = create_features(
+        data
+    )
+
 
     # Salva dataset intermediário
     save_dataset(
@@ -51,8 +66,12 @@ def main():
         output_path,
     )
 
+
     # Separa treino e teste
-    X_train, X_test, y_train, y_test = split_data(data)
+    X_train, X_test, y_train, y_test = split_data(
+        data
+    )
+
 
     # Cross Validation
     best_model_name, best_threshold = cross_validate_models(
@@ -60,24 +79,38 @@ def main():
         y_train,
     )
 
-    # Cria os pipelines
+
+    # Cria pipelines
     pipelines = {
         "Gradient Boosting": create_gradient_boosting_pipeline(),
         "XGBoost": create_xgboost_pipeline(),
         "LightGBM": create_lightgbm_pipeline(),
     }
 
-    # Seleciona o melhor modelo
+
+    # Seleciona melhor modelo
     best_model = pipelines[best_model_name]
 
-    # Treina o modelo vencedor
+
+    # Treina modelo final
     best_model = train_model(
         best_model,
         X_train,
         y_train,
     )
 
-    # Avaliação final no conjunto de teste
+
+    # Salva modelo treinado
+    save_model(
+        model=best_model,
+        model_name=best_model_name,
+        threshold=best_threshold,
+        model_path=MODELS_DIR / "best_model.joblib",
+        metadata_path=MODELS_DIR / "metadata.json",
+    )
+
+
+    # Avaliação final
     evaluate_model(
         best_model,
         X_test,
